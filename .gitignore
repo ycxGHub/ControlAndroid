@@ -5,3 +5,8 @@
 *.err
 *.class
 
+/Server/target
+/ClientControl/target
+/ClientControl/bin
+/ClientExcutor/target
+/ClientExcutor/bin
