@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -17,8 +18,10 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import bean.ClientBean;
 import bean.ClientBean.ClientBeanType;
 import handler.ChannelManager;
-import service.TimeClient;
-import service.iml.INotifyServer;
+import service.HeartService;
+import service.INotifyServer;
+import service.ServerConnectService;
+import util.NumberPicker;
 import util.CmdManager.ConnectCmd;
 import util.CmdManager.MeaCmd;
 
@@ -35,7 +38,9 @@ public class MainWindow extends JFrame implements INotifyServer {
 	private Box root;
 	private JTextArea textArea;
 	private Button login;
-
+	private JTextField androidId;
+	private JTextField currentDeviceId;
+	private JTextField data;
 	/**
 	 * Launch the application.
 	 * 
@@ -58,7 +63,7 @@ public class MainWindow extends JFrame implements INotifyServer {
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -70,26 +75,37 @@ public class MainWindow extends JFrame implements INotifyServer {
 		Box boxh1 = Box.createHorizontalBox();
 		boxh1.add(new JLabel("Android DeviceId"));
 		boxh1.add(Box.createHorizontalStrut(10));
-		JTextField androidId = new JTextField(20);
+		androidId = new JTextField(20);
+		androidId.addKeyListener(new NumberPicker());
 		boxh1.add(androidId);
 
 		Box boxh2 = Box.createHorizontalBox();
 		boxh2.add(new JLabel("Current DeviceId"));
 		boxh2.add(Box.createHorizontalStrut(10));
-		JTextField currentDeviceId = new JTextField(20);
-		boxh2.add(currentDeviceId);
-
+		currentDeviceId = new JTextField(20);
+		currentDeviceId.addKeyListener(new NumberPicker());
+		boxh2.add(currentDeviceId);  
+		
+		
+		Box boxh5 = Box.createHorizontalBox();
+		boxh5.add(new JLabel("Data To RemoteDevice"));
+		boxh5.add(Box.createHorizontalStrut(10));
+		data = new JTextField(20);
+		boxh5.add(data);  
+		
+		
 		Box boxh4 = Box.createHorizontalBox();
 		Button senCmd = new Button("Send Meausure Cmd");
 		boxh4.add(senCmd);
 		senCmd.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				ChannelManager.sendCmd(androidId.getText());
+				ChannelManager.sendMeaCmd(currentDeviceId.getText(),androidId.getText(),data.getText());
 			}
 		});
+		
+		
 		Box boxh3 = Box.createHorizontalBox();
 		login = new Button("LOGIN");
 		boxh3.add(login);
@@ -104,7 +120,7 @@ public class MainWindow extends JFrame implements INotifyServer {
 						// TODO Auto-generated method stub
 						try {
 							textArea.setText("Main login click");
-							TimeClient.start(MainWindow.this);
+							ServerConnectService.start(MainWindow.this);
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -119,6 +135,8 @@ public class MainWindow extends JFrame implements INotifyServer {
 		root.add(Box.createVerticalStrut(10));
 		root.add(boxh2);
 		root.add(Box.createVerticalStrut(10));
+		root.add(boxh5);
+		root.add(Box.createVerticalStrut(10));
 		root.add(boxh3);
 		root.add(Box.createVerticalStrut(10));
 		root.add(boxh4);
@@ -126,7 +144,10 @@ public class MainWindow extends JFrame implements INotifyServer {
 		getContentPane().add(contentPane, BorderLayout.NORTH);
 
 		textArea = new JTextArea();
-		getContentPane().add(textArea, BorderLayout.CENTER);
+		JScrollPane jsp = new JScrollPane(textArea);
+		jsp.setVerticalScrollBarPolicy( 
+		JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); 
+		getContentPane().add(jsp, BorderLayout.CENTER);
 	}
 
 	@Override
@@ -139,17 +160,17 @@ public class MainWindow extends JFrame implements INotifyServer {
 		// TODO Auto-generated method stub
 		login.setVisible(!state);
 		if (state) {
-			addTextAreaData("login success!\n" + "ServerAddress"
-					+ChannelManager.getServerAddress());
-			ChannelManager.sendCmd(ConnectCmd.ConnectServer, MeaCmd.MeaDis);
-		}
-		else {
-			addTextAreaData("login failed!") ;
+			addTextAreaData("login success!\n" + "ServerAddress" + ChannelManager.getServerAddress());
+			ChannelManager.sendConnectCmd(ConnectCmd.ConnectServer,currentDeviceId.getText());
+			HeartService heartService = new HeartService();
+			heartService.startConnectServiceOnTime(1000 * 90, currentDeviceId.getText());
+		} else {
+			addTextAreaData("login failed!");
 		}
 	}
 
 	public void addTextAreaData(String data) {
-		String old = textArea.getText();
-		textArea.setText(old + "\n" + data);
+		textArea.append("\n"+data);
+		textArea.setCaretPosition(textArea.getText().length());
 	}
 }

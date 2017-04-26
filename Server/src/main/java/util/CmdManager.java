@@ -6,7 +6,7 @@ public class CmdManager {
 	}
 	public enum ConnectCmd{
 		ConnetClient,ConnectServer,UnConnectClient,UnConnectServer,
-		SendMeaCmd,SendData,GetData
+		SendMeaCmd,SendData,GetData,HeartPackage
 	}
 	public enum DeviceStyle{
 		MeaClient,ControlClient,Server

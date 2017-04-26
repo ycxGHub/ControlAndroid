@@ -1,5 +1,6 @@
 package decice;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 
 import bean.ClientBean;
@@ -11,30 +12,36 @@ public class ControlDevicesManager {
 	private static ControlDevicesManager scontrolDevicesManager;
 
 	private ControlDevicesManager() {
+
 	}
 
 	public static ControlDevicesManager getInstance() {
-		if (scontrolDevicesManager != null) {
+		if (scontrolDevicesManager == null) {
 			scontrolDevicesManager = new ControlDevicesManager();
 		}
 		return scontrolDevicesManager;
 	}
 
-	public void addControlDevice(ChannelHandlerContext channelHandlerContext, String currentId) {
+	public void addControlDevice(ChannelHandlerContext channelHandlerContext, long currentId) {
 		for (ControlDevice controlDevice2 : controlDevices) {
-			if (controlDevice2.getDeviceId().equals(currentId)) {
+			if (controlDevice2.getDeviceId() == (currentId)) {
 				return;
 			}
 		}
 		ControlDevice controlDevice = new ControlDevice(currentId, channelHandlerContext);
+		controlDevice.setAlive(true);
 		controlDevices.add(controlDevice);
+		for (ControlDevice controlDevice2 : controlDevices) {
+			System.out.println("current onLine Device: " + controlDevice2.getDeviceId());
+		}
 	}
 
-	public void removeControlDevice(ControlDevice controlDevice) {
+	public void removeControlDevice(SocketAddress  socketAddress) {
 		int index = -1;
 		for (ControlDevice controlDevice2 : controlDevices) {
-			if (controlDevice2.getDeviceId() .equals( controlDevice.getDeviceId())) {
+			if (controlDevice2.getContext().channel().remoteAddress().equals(socketAddress)) {
 				index = controlDevices.indexOf(controlDevice2);
+				System.out.println(index + "");
 			}
 		}
 		if (index >= 0) {
@@ -42,13 +49,17 @@ public class ControlDevicesManager {
 		}
 	}
 
-	public ControlDevice getControlDevice(String currentId) {
+	public ControlDevice getControlDevice(long currentId) {
+		System.out.println(currentId + "");
 		for (ControlDevice controlDevice2 : controlDevices) {
-			if (controlDevice2.getDeviceId() .equals( currentId)) {
+			if (controlDevice2.getDeviceId() == currentId) {
 				return controlDevice2;
 			}
 		}
 		return null;
+	}
+
+	public void checkDeviceIsActive() {
 	}
 
 }

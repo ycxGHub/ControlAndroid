@@ -12,7 +12,7 @@ public class MeaDevicesManager {
 		// TODO Auto-generated constructor stub
 	}
 	public static MeaDevicesManager getInstance() {
-		if (scontrolDevicesManager != null) {
+		if (scontrolDevicesManager == null) {
 			scontrolDevicesManager = new MeaDevicesManager();
 		}
 		return scontrolDevicesManager;

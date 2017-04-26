@@ -33,7 +33,7 @@ public class DiscardServer {
 	                 @Override
 	                 public void initChannel(SocketChannel ch) throws Exception {
 	                	 ch.pipeline().addLast(new ObjectEncoder());//编码
-	                	 ch.pipeline().addLast(new DiscardOutHandler());//out 逆序
+//	                	 ch.pipeline().addLast(new DiscardOutHandler());//out 逆序
 	                	 
 	                	 
 	                	 ch.pipeline().addLast(new ObjectDecoder(1024*1024, ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));//解码

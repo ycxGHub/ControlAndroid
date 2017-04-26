@@ -5,8 +5,8 @@ import bean.ServerBean;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.nio.AbstractNioChannel.NioUnsafe;
-import service.TimeClient;
-import service.iml.INotifyServer;
+import service.INotifyServer;
+import service.ServerConnectService;
 import util.CmdManager.ConnectCmd;
 
 public class ClientInFirstHandler extends ChannelInboundHandlerAdapter {
@@ -26,7 +26,7 @@ public class ClientInFirstHandler extends ChannelInboundHandlerAdapter {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 		ctx.close();
 		ChannelManager.writeToServerChannel=null;
-		TimeClient.isOnlogin = false;
+		ServerConnectService.isOnlogin = false;
 		iNotifyServer.notifyClientConnectState(false);
 	}
 

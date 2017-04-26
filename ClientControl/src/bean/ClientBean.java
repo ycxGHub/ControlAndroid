@@ -10,8 +10,11 @@ public class ClientBean implements Serializable{
 	public enum ClientBeanType{
 		Controler,ExCutor
 	}
+	public long DeviceID=-1;
 	public String name="default";
 	public ClientBeanType myType;
 	public CmdManager.ConnectCmd connectcmd;
 	public CmdManager.MeaCmd meaCmd;
+	public String data="";
+	public long remoteDeviceID=-1;
 }
